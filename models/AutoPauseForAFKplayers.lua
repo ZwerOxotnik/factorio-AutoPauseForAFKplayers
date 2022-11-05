@@ -97,7 +97,7 @@ M.events_when_off = {
 }
 
 M.on_nth_tick = {
-	[60 * 60 / 5] = check_AFK_time,
+	[60 * 60] = check_AFK_time,
 }
 
 
