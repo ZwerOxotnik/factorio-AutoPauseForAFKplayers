@@ -1,8 +1,8 @@
-﻿---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 2023-02-08
   Changes:
-    - Some player events will disable auto-pause wuthout using the command
+    - Some player events will disable auto-pause without using the command
   Locale:
     - Added Ukrainian translation (thanks to @Met_en_Bouldry on crowdin)
     - Translations: https://crowdin.com/project/factorio-mods-localization (thank you for contributions, I really appreciate it)
