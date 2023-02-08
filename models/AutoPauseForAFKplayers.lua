@@ -9,6 +9,12 @@ local INFORM_ABOUT_PAUSE_MESSAGE = {"AutoPauseForAFKplayers.inform_about_pause"}
 
 --#region Functions of events
 
+local function enable_game()
+	if not global.is_paused then return end
+	game.tick_paused = false
+	global.is_paused = false
+end
+
 local function check_AFK_time(event)
 	if #game.connected_players == 0 then return end
 
@@ -90,7 +96,11 @@ M.add_remote_interface = add_remote_interface
 
 M.events = {
 	[defines.events.on_runtime_mod_setting_changed] = on_runtime_mod_setting_changed,
-	[defines.events.on_player_joined_game] = on_player_joined_game
+	[defines.events.on_player_joined_game] = on_player_joined_game,
+	[defines.events.on_player_toggled_alt_mode] = enable_game,
+	[defines.events.on_gui_click] = enable_game,
+	[defines.events.on_console_command] = enable_game,
+	[defines.events.on_console_chat] = enable_game
 }
 M.events_when_off = {
 	[defines.events.on_player_joined_game] = on_player_joined_game
