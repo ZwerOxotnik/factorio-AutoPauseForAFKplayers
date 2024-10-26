@@ -1,8 +1,9 @@
 ---@class AP4AFKps : module
-local M = {}
+local M = {
+	__max_AFK_time_in_ticks = settings.global["AP4AFKps_max_AFK_time"].value * 60 * 60 -- minutes to ticks
+}
 
 
-local max_AFK_time_in_ticks = settings.global["AP4AFKps_max_AFK_time"].value * 60 * 60 -- minutes to ticks
 local RED_COLOR = {1, 0, 0}
 local INFORM_ABOUT_PAUSE_MESSAGE = {"AutoPauseForAFKplayers.inform_about_pause"}
 
@@ -10,23 +11,25 @@ local INFORM_ABOUT_PAUSE_MESSAGE = {"AutoPauseForAFKplayers.inform_about_pause"}
 --#region Functions of events
 
 local function enable_game()
-	if not global.is_paused then return end
+	if not storage.is_paused then return end
+
 	game.tick_paused = false
-	global.is_paused = false
+	storage.is_paused = false
 end
 
 local function check_AFK_time(event)
 	if #game.connected_players == 0 then return end
 
+	local __max_AFK_time_in_ticks = M.__max_AFK_time_in_ticks
 	for _, player in pairs(game.connected_players) do
 		if player.valid then
-			if player.afk_time < max_AFK_time_in_ticks then
+			if player.afk_time < __max_AFK_time_in_ticks then
 				return
 			end
 		end
 	end
 
-	global.is_paused = true
+	storage.is_paused = true
 	game.tick_paused = true
 	for _, player in pairs(game.connected_players) do
 		if player.valid then
@@ -38,7 +41,7 @@ end
 local MOD_SETTINGS = {
 	["AP4AFKps_max_AFK_time"] = function(value)
 		 -- minutes to ticks
-		max_AFK_time_in_ticks = value * 60 * 60
+		M.__max_AFK_time_in_ticks = value * 60 * 60
 	end,
 }
 local function on_runtime_mod_setting_changed(event)
@@ -53,31 +56,22 @@ local function on_player_joined_game(event)
 	local player = game.get_player(event.player_index)
 	if not (player and player.valid) then return end
 
-	if global.is_paused then
-		game.tick_paused = false
-		global.is_paused = false
-	end
+	enable_game()
 end
 
 --#endregion
 
 
 M.on_mod_enabled = function()
-	max_AFK_time_in_ticks = settings.global["AP4AFKps_max_AFK_time"].value * 60 * 60
+	M.__max_AFK_time_in_ticks = settings.global["AP4AFKps_max_AFK_time"].value * 60 * 60
 end
 M.on_mod_disabled = function()
-	if global.is_paused then
-		game.tick_paused = false
-		global.is_paused = false
-	end
+	enable_game()
 end
 
 
 commands.add_command("unpause", {"AutoPauseForAFKplayers.unpause_command"}, function(cmd)
-	if global.is_paused then
-		game.tick_paused = false
-		global.is_paused = false
-	end
+	enable_game()
 end)
 
 
